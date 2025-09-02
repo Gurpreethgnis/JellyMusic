@@ -7,6 +7,9 @@ plugins {
     id("org.jlleitschuh.gradle.ktlint")
 }
 
+// Disable JDK image transformation for this module
+System.setProperty("android.enableJdkImageTransform", "false")
+
 android {
     namespace = "com.jellymusic.data"
     compileSdk = 34
@@ -20,6 +23,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    
+    // Temporarily comment out Java compilation disable to test Hilt
+// tasks.withType<JavaCompile> {
+//     enabled = false
+// }
     
     kotlinOptions {
         jvmTarget = "17"

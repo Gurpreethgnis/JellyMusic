@@ -1,217 +1,176 @@
 # JellyMusic
 
-A modern Android music player app for Jellyfin servers built with Kotlin, Jetpack Compose, and Material 3.
+A modern Android music player app for Jellyfin media servers, built with Kotlin, Jetpack Compose, and Material 3.
 
 ## Features
 
-- **Multi-module Architecture**: Clean separation with app, data, domain, and player modules
-- **Modern UI**: Built with Jetpack Compose and Material 3 design system
-- **Jellyfin Integration**: Connect to your Jellyfin server to browse and play music
-- **Media3 Player**: Advanced audio playback with ExoPlayer
-- **Google Cast Support**: Cast music to Chromecast devices
-- **Offline Caching**: Room database for offline-first experience
-- **Paging**: Efficient loading of large music libraries
-- **Search**: Fast search across artists, albums, and tracks
+- **Modern UI**: Built with Jetpack Compose and Material 3
+- **Jellyfin Integration**: Connect to your Jellyfin media server
+- **Authentication**: Secure login with credential storage
+- **Multi-module Architecture**: Clean separation of concerns
+- **Dependency Injection**: Hilt for clean architecture
+- **Networking**: Retrofit with OkHttp for API calls
+- **Local Storage**: DataStore for secure credential storage
 
 ## Architecture
 
-The project follows Clean Architecture principles with the following modules:
-
-- **app**: UI layer with Compose screens and navigation
-- **domain**: Business logic, models, and repository interfaces
-- **data**: Data layer with API clients, database, and repository implementations
-- **player**: Media playback with Media3 and Cast functionality
-
-## Tech Stack
-
-- **Language**: Kotlin
-- **UI**: Jetpack Compose + Material 3
-- **Architecture**: MVVM with Clean Architecture
-- **Dependency Injection**: Hilt
-- **Networking**: Retrofit + OkHttp + Kotlinx Serialization
-- **Database**: Room + Paging 3
-- **Media**: Media3 (ExoPlayer) + Cast SDK
-- **Image Loading**: Coil
-- **Build System**: Gradle with Version Catalogs
-- **Code Quality**: ktlint
+```
+JellyMusic/
+├── app/          # Main application module
+├── data/         # Data layer (API, database, repositories)
+├── domain/       # Domain layer (models, use cases)
+└── player/       # Media player module
+```
 
 ## Prerequisites
 
 - Android Studio Hedgehog (2023.1.1) or later
 - Android SDK 34
 - JDK 17
-- Android device or emulator with API level 24+
+- Kotlin 1.9.21
 
-## Build Instructions
+## Setup
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Gurpreethgnis/JellyMusic.git
 cd JellyMusic
 ```
 
-### 2. Open in Android Studio
+### 2. Configure Android SDK
 
-Open the project in Android Studio. The project uses Gradle with version catalogs, so dependencies will be automatically resolved.
+The project includes automated scripts to configure your Android SDK:
 
-### 3. Sync Project
-
-After opening the project, Android Studio will prompt you to sync the project with Gradle files. Click "Sync Now" or go to:
-- File → Sync Project with Gradle Files
-
-### 4. Build the Project
-
-#### Debug Build
+**Windows:**
 ```bash
-./gradlew assembleDebug
+setup-android-sdk.bat
 ```
 
-#### Release Build
-```bash
-./gradlew assembleRelease
+**PowerShell:**
+```powershell
+.\setup-android-sdk.ps1
 ```
 
-### 5. Install on Device
-
-#### Using ADB
-```bash
-# Enable USB debugging on your device
-# Connect device via USB
-adb install app/build/outputs/apk/debug/app-debug.apk
+**Manual Setup:**
+Create `local.properties` in the project root:
+```properties
+sdk.dir=C:\\Users\\YourUsername\\AppData\\Local\\Android\\Sdk
 ```
 
-#### Using Android Studio
-1. Connect your device via USB
-2. Enable USB debugging
-3. Click the "Run" button (green play icon) in Android Studio
-4. Select your device and click "OK"
+### 3. Build the Project
+
+**Important**: This project requires a special build command due to JDK image transformation issues.
+
+**Option 1: Use the provided wrapper scripts (Recommended)**
+
+**Windows:**
+```bash
+gradlew-with-jdk-fix.bat app:assembleDebug
+```
+
+**Unix/Linux/macOS:**
+```bash
+./gradlew-with-jdk-fix.sh app:assembleDebug
+```
+
+**Option 2: Use command-line flag**
+```bash
+./gradlew app:assembleDebug -Dandroid.enableJdkImageTransform=false
+```
+
+**Option 3: Build in Android Studio**
+1. Open the project in Android Studio
+2. Add `-Dandroid.enableJdkImageTransform=false` to VM options in Run/Debug Configurations
+3. Build and run
 
 ## Project Structure
 
-```
-JellyMusic/
-├── app/                          # Main application module
-│   ├── src/main/
-│   │   ├── java/com/jellymusic/app/
-│   │   │   ├── navigation/       # Navigation components
-│   │   │   └── ui/              # UI components and screens
-│   │   └── res/                 # Resources
-│   └── build.gradle.kts
-├── data/                         # Data layer module
-│   ├── src/main/java/com/jellymusic/data/
-│   │   ├── local/               # Room database
-│   │   ├── remote/              # API clients
-│   │   └── repository/          # Repository implementations
-│   └── build.gradle.kts
-├── domain/                       # Domain layer module
-│   ├── src/main/java/com/jellymusic/domain/
-│   │   ├── model/               # Domain models
-│   │   ├── repository/          # Repository interfaces
-│   │   └── usecase/             # Use cases
-│   └── build.gradle.kts
-├── player/                       # Player module
-│   ├── src/main/java/com/jellymusic/player/
-│   │   ├── service/             # Media session service
-│   │   └── cast/                # Cast functionality
-│   └── build.gradle.kts
-├── gradle/
-│   └── libs.versions.toml       # Version catalog
-├── build.gradle.kts             # Root build file
-├── settings.gradle.kts          # Project settings
-└── README.md
-```
+### App Module (`app/`)
+- Main activity and application class
+- UI components and screens
+- Navigation setup
+- Hilt ViewModels
 
-## Configuration
+### Data Module (`data/`)
+- Jellyfin API client (Retrofit)
+- Repository implementations
+- Data mappers
+- Local storage (DataStore)
 
-### Jellyfin Server Setup
+### Domain Module (`domain/`)
+- Domain models
+- Repository interfaces
+- Use cases (future)
 
-1. Ensure your Jellyfin server is running and accessible
-2. Note your server URL (e.g., `http://192.168.1.100:8096`)
-3. Create a user account on your Jellyfin server
-4. The app will prompt for server URL and credentials on first launch
+### Player Module (`player/`)
+- Media3/ExoPlayer integration (future)
 
-### Cast Setup
+## Key Technologies
 
-For Google Cast functionality:
-1. Ensure your device is on the same network as Chromecast devices
-2. Cast devices will be automatically discovered
-3. Use the cast button in the player to start casting
-
-## Development
-
-### Code Style
-
-The project uses ktlint for code formatting. To format code:
-
-```bash
-./gradlew ktlintFormat
-```
-
-To check code style:
-
-```bash
-./gradlew ktlintCheck
-```
-
-### Adding New Features
-
-1. **Domain Layer**: Add models and repository interfaces
-2. **Data Layer**: Implement repository interfaces
-3. **App Layer**: Create UI components and screens
-4. **Player Layer**: Add media functionality if needed
-
-### Testing
-
-Run tests:
-
-```bash
-./gradlew test                    # Unit tests
-./gradlew connectedAndroidTest    # Instrumented tests
-```
+- **UI**: Jetpack Compose, Material 3
+- **Architecture**: MVVM with Clean Architecture
+- **DI**: Hilt
+- **Networking**: Retrofit, OkHttp
+- **Serialization**: Gson
+- **Local Storage**: DataStore
+- **Testing**: MockK, MockWebServer, Turbine
 
 ## Troubleshooting
 
-### Build Issues
+### JDK Image Transformation Error
 
-1. **Gradle Sync Failed**: 
-   - Check internet connection
-   - Invalidate caches: File → Invalidate Caches and Restart
-   - Clean project: Build → Clean Project
+If you encounter the error:
+```
+Execution failed for task ':data:compileDebugJavaWithJavac'.
+> Could not resolve all files for configuration ':data:androidJdkImage'.
+```
 
-2. **Missing Dependencies**:
-   - Sync project with Gradle files
-   - Check `gradle/libs.versions.toml` for correct versions
+**Solution**: Use the provided wrapper scripts or add the system property:
+```bash
+./gradlew-with-jdk-fix.sh [your-command]
+```
 
-3. **Compilation Errors**:
-   - Ensure JDK 17 is set in Project Structure
-   - Check Kotlin version compatibility
+### Android SDK Not Found
 
-### Runtime Issues
+If you get "SDK location not found":
+1. Run the setup script: `setup-android-sdk.bat` (Windows) or `./setup-android-sdk.ps1` (PowerShell)
+2. Or manually create `local.properties` with your SDK path
 
-1. **App Crashes on Launch**:
-   - Check logcat for error details
-   - Ensure all permissions are granted
+### Build Failures
 
-2. **Network Issues**:
-   - Verify Jellyfin server URL is correct
-   - Check network connectivity
-   - Ensure server is accessible from device
+1. Clean the project: `./gradlew clean`
+2. Use the JDK fix wrapper: `./gradlew-with-jdk-fix.sh clean build`
+3. Check Android SDK configuration
+
+## Development
+
+### Running Tests
+
+```bash
+# Run all tests
+./gradlew-with-jdk-fix.sh test
+
+# Run specific module tests
+./gradlew-with-jdk-fix.sh data:test
+./gradlew-with-jdk-fix.sh app:test
+```
+
+### Code Style
+
+The project uses ktlint for code formatting:
+```bash
+./gradlew-with-jdk-fix.sh ktlintFormat
+```
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Run tests and linting
+4. Test with the JDK fix wrapper
 5. Submit a pull request
 
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- [Jellyfin](https://jellyfin.org/) for the media server platform
-- [Android Jetpack](https://developer.android.com/jetpack) for modern Android development tools
-- [Material Design](https://material.io/) for design guidelines
