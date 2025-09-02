@@ -21,12 +21,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     
-    // Disable only JDK image transformation tasks, not Java compilation
-    tasks.matching { task ->
-        task.name.contains("JdkImageTransform") || 
-        task.name.contains("androidJdkImage")
-    }.configureEach {
-        enabled = false
+    // Disable only JDK image transformation tasks, preserve Java compilation
+    afterEvaluate {
+        tasks.matching { task ->
+            task.name.contains("JdkImageTransform") || 
+            task.name.contains("androidJdkImage")
+        }.configureEach {
+            enabled = false
+        }
     }
     
     kotlinOptions {
