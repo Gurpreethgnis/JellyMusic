@@ -34,6 +34,16 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+
+    // Disable JDK image transformation tasks
+    afterEvaluate {
+        tasks.matching { task ->
+            task.name.contains("JdkImageTransform") || 
+            task.name.contains("androidJdkImage")
+        }.configureEach {
+            enabled = false
+        }
+    }
 }
 
 dependencies {
