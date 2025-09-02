@@ -1,6 +1,7 @@
 package com.jellymusic.domain.repository
 
 import com.jellymusic.domain.model.AuthResult
+import com.jellymusic.domain.model.AuthState
 import com.jellymusic.domain.model.LoginCredentials
 import com.jellymusic.domain.model.ServerInfo
 import com.jellymusic.domain.model.User

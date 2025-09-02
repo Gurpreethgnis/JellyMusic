@@ -1,10 +1,10 @@
 package com.jellymusic.app.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Album
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PlaylistPlay
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.List
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.jellymusic.app.R
 
@@ -22,13 +22,13 @@ sealed class Screen(
     object Albums : Screen(
         route = "albums",
         resourceId = R.string.nav_albums,
-        icon = Icons.Default.Album
+        icon = Icons.Default.List
     )
     
     object Playlists : Screen(
         route = "playlists",
         resourceId = R.string.nav_playlists,
-        icon = Icons.Default.PlaylistPlay
+        icon = Icons.Default.List
     )
     
     object Search : Screen(
