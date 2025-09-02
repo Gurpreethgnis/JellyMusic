@@ -23,8 +23,8 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.serialization.json.Json
+import retrofit2.converter.gson.GsonConverterFactory
+import com.google.gson.Gson
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AuthRepositoryIntegrationTest {
@@ -48,14 +48,11 @@ class AuthRepositoryIntegrationTest {
         every { mockContext.dataStore } returns mockDataStore
         
         // Create real Retrofit with MockWebServer
-        val json = Json {
-            ignoreUnknownKeys = true
-            coerceInputValues = true
-        }
+        val gson = Gson()
         
         val retrofit = Retrofit.Builder()
             .baseUrl(mockWebServer.url("/"))
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
         
         val api = retrofit.create(JellyfinApi::class.java)
@@ -91,7 +88,12 @@ class AuthRepositoryIntegrationTest {
         
         coEvery { 
             mockDataStore.edit(any()) 
-        } returns mockDataStore
+        } answers {
+            val editBlock = firstArg<suspend (Preferences) -> Preferences>()
+            val mockPrefs = mockk<Preferences>()
+            coEvery { editBlock(mockPrefs) } returns mockPrefs
+            mockDataStore
+        }
         
         // When
         val result = authRepository.login(credentials)
