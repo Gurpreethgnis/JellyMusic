@@ -1,0 +1,115 @@
+Product Spec — “JellyMusic” (working name)
+1) Goal
+
+A local-install Android app (no store submission) that:
+
+discovers & browses music from a Jellyfin server
+
+plays locally (background, lock screen controls)
+
+casts to Chromecast/Google Cast with queue & metadata
+
+has a simple, clean UI (YouTube Music–like, but minimal)
+
+2) Non-Goals (for v0)
+
+video, podcasts, multi-profile management
+
+complex recommendations, lyrics, widgets
+
+robust offline downloads (optional later)
+
+tablet polish, Android Auto
+
+3) Primary user stories
+
+As a user, I enter my Jellyfin server URL + credentials and see my Artists / Albums / Playlists.
+
+I can search my library quickly.
+
+I can tap an album/playlist, see tracks, start playback; queue continues in background.
+
+I can cast to a Chromecast device; queue/metadata sync to the cast session; I can handoff between local/cast.
+
+When I reopen the app, it resumes my last session (local or cast).
+
+4) Architecture (high level)
+
+Language/Libs: Kotlin, Jetpack Compose, Material 3, Media3 (ExoPlayer), Hilt, Retrofit/OkHttp, Room, Paging 3, Coil, WorkManager (optional later).
+
+Layers: app (UI/Compose), domain (use cases & models), data (Retrofit, Room), player (MediaSessionService + Cast sender).
+
+State: Single-source-of-truth repositories; offline-first caches for catalogs & images.
+
+Playback: Media3 MediaSessionService + notification + lock-screen controls.
+
+Cast: Google Cast SDK (CAF v3) sender; unified queue model shared with local playback.
+
+5) Data model (simplified)
+
+Artist(id, name, imageUrl)
+
+Album(id, name, artistId, year?, imageUrl)
+
+Track(id, albumId, artistId, name, durationMs, streamUrl, mediaType)
+
+Playlist(id, name, trackIds[]) (optional later)
+
+LibraryIndex for fast alphabetical browse & search cache.
+
+6) Jellyfin API (music endpoints you’ll use)
+
+Auth: POST /Users/AuthenticateByName
+
+Images: /Items/{id}/Images/Primary
+
+Artists: GET /Artists (or /Users/{userId}/Items?IncludeItemTypes=MusicArtist)
+
+Albums: GET /Albums (or /Users/{userId}/Items?IncludeItemTypes=MusicAlbum)
+
+Tracks: GET /Users/{userId}/Items?IncludeItemTypes=Audio&AlbumIds=...
+
+Search: GET /Search/Hints?SearchTerm=...
+
+Stream: GET /Audio/{itemId}/universal (or /Audio/{id}/stream) with auth headers
+
+All calls must include Jellyfin’s auth headers:
+X-Emby-Authorization: MediaBrowser Client="JellyMusic", Device="Android", DeviceId="...", Version="0.1.0" + X-MediaBrowser-Token: <token>
+
+7) UX flow (minimum)
+
+Login → server URL, username, password → token save.
+
+Home: tabs {Artists, Albums, Playlists, Search}. Large cover grids; fast scroll.
+
+Detail: Album or Artist page → track list → Play / Shuffle.
+
+Now Playing: artwork, scrubber, next/prev, shuffle/repeat, Cast button.
+
+Cast mini-controller when casting (connect/disconnect, current item, queue length).
+
+8) Casting behavior (definition of done)
+
+Detect Chromecast devices, connect/disconnect reliably.
+
+Start cast with current queue & position; sender shows cast controls.
+
+Reconnect after app/background kill (SessionManagerListener).
+
+Metadata (title, artist, album art, duration) visible on the cast device.
+
+Switching back to local preserves queue and position.
+
+9) Performance & a11y baselines
+
+Paging on lists; prefetch artwork; 60fps scroll on 5k-10k items libraries.
+
+Content descriptions for controls; sensible focus order; large tap targets.
+
+10) Build, install, run
+
+Min SDK 24+, Target latest stable.
+
+Local config screen to set server URL; store token in EncryptedSharedPreferences.
+
+Sideload via ./gradlew assembleDebug → install APK on device.
